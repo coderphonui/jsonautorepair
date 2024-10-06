@@ -52,7 +52,7 @@ public class EscapeProcessor {
     }
 
     private void handleQuoteNextToQuoteCase(char currentChar, int i) {
-        int nextQuotePosition = getNextNoneSpaceCharPosition(i + 1);
+        int nextQuotePosition = getNextNonSpaceCharPosition(i + 1);
         // If next valid quote is a good close quote, then the current quote MUST be an escaped quote
         if(isValidCloseQuote(nextQuotePosition)) {
             escapedJson.append(ESCAPE_CHAR);
@@ -72,7 +72,7 @@ public class EscapeProcessor {
         return findNextValidChar(position + 1) == DOUBLE_QUOTE_CHAR;
     }
 
-    private int getNextNoneSpaceCharPosition(int position) {
+    private int getNextNonSpaceCharPosition(int position) {
         for (int i = position; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
             if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
