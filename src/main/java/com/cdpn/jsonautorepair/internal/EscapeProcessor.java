@@ -2,27 +2,35 @@ package com.cdpn.jsonautorepair.internal;
 
 public class EscapeProcessor {
     private static final char EOF = '\0';
+    private static final char TAB_CHAR = '\t';
+    private static final char BREAK_LINE_CHAR = '\n';
+    private static final char SPACE_CHAR = ' ';
+
     private final String inputString;
     private boolean inQuotes = false;
     private StringBuilder escapedJson;
+
     public EscapeProcessor(String inputString) {
         this.inputString = inputString;
     }
+
+
     public String process() {
         escapedJson = new StringBuilder();
         inQuotes = false;
         for (int i = 0; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
             if (currentChar != '\"') {
-                processForNonQuoteCharacter(currentChar);
-                continue;
+                handleNonQuoteCharacter(currentChar);
             }
-            processQuoteCharacter(currentChar, i);
+            else {
+                handleQuoteCharacter(currentChar, i);
+            }
         }
         return escapedJson.toString();
     }
 
-    private void processQuoteCharacter(char currentChar, int i) {
+    private void handleQuoteCharacter(char currentChar, int i) {
         if (!inQuotes) {
             inQuotes = true;
             escapedJson.append(currentChar);
@@ -33,26 +41,39 @@ public class EscapeProcessor {
             escapedJson.append(currentChar);
             return;
         }
-        if(findNextValidChar(i + 1) == '\"') {
-            int nextValidCharPosition = getNextValidCharPosition(i + 1);
-            if(isValidCloseQuote(nextValidCharPosition)) {
-                escapedJson.append('\\');
-                escapedJson.append(currentChar);
-                return;
-            }
-            inQuotes = false;
-            escapedJson.append(currentChar);
-            escapedJson.append(',');
+        if(hasNextQuoteRightAfterCurrentQuoteWithoutComma(i + 1)) {
+            handleQuoteNextToQuoteCase(currentChar, i);
             return;
         }
         escapedJson.append('\\');
         escapedJson.append(currentChar);
     }
 
+    private void handleQuoteNextToQuoteCase(char currentChar, int i) {
+        int nextQuotePosition = getNextValidCharPosition(i + 1);
+        // If next valid quote is a good close quote, then the current quote MUST be an escaped quote
+        if(isValidCloseQuote(nextQuotePosition)) {
+            escapedJson.append('\\');
+            escapedJson.append(currentChar);
+        }
+        else {
+            // If the next valid quote is not a good close quote, then the current quote should be a good close quote
+            // However, the current quote and the next quote is next to each other (without separation by a comma),
+            // we need to add a comma in between
+            inQuotes = false;
+            escapedJson.append(currentChar);
+            escapedJson.append(',');
+        }
+    }
+
+    private boolean hasNextQuoteRightAfterCurrentQuoteWithoutComma(int position) {
+        return findNextValidChar(position + 1) == '\"';
+    }
+
     private int getNextValidCharPosition(int position) {
         for (int i = position; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
-            if (currentChar != ' ' && currentChar != '\n' && currentChar != '\t') {
+            if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
                 return i;
             }
         }
@@ -60,12 +81,12 @@ public class EscapeProcessor {
     }
 
 
-    private void processForNonQuoteCharacter(char currentChar) {
+    private void handleNonQuoteCharacter(char currentChar) {
         if (!inQuotes) {
             escapedJson.append(currentChar);
             return;
         }
-        if(currentChar == '\t' || currentChar == '\n') {
+        if(currentChar == TAB_CHAR || currentChar == BREAK_LINE_CHAR) {
             escapedJson.append(getEscapeSequence(currentChar));
             return;
         }
@@ -74,8 +95,8 @@ public class EscapeProcessor {
 
     private String getEscapeSequence(char currentChar) {
         return switch (currentChar) {
-            case '\t' -> "\\t";
-            case '\n' -> "\\n";
+            case TAB_CHAR -> "\\t";
+            case BREAK_LINE_CHAR -> "\\n";
             default -> "";
         };
     }
@@ -91,7 +112,7 @@ public class EscapeProcessor {
     private char findNextValidChar(int position) {
         for (int i = position; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
-            if (currentChar != ' ' && currentChar != '\n' && currentChar != '\t') {
+            if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
                 return currentChar;
             }
         }

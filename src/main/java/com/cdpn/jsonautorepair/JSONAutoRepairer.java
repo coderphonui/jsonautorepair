@@ -1,12 +1,13 @@
 package com.cdpn.jsonautorepair;
 
-import com.cdpn.jsonautorepair.internal.BasicCorrector;
+
 import com.cdpn.jsonautorepair.internal.EscapeProcessor;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class JSONAutoRepairer {
+
     public String repair(String json) {
         String processedJSON = json.trim();
         if(processedJSON.isEmpty()) {
@@ -21,6 +22,17 @@ public class JSONAutoRepairer {
         }
     }
 
+    private String wrapWithBracketWhenNotAJSONArray(String processedJSON) {
+        if (!processedJSON.startsWith("{") && !processedJSON.startsWith("[")) {
+            processedJSON = "{" + processedJSON;
+        }
+
+        if (!processedJSON.endsWith("}") && !processedJSON.endsWith("]")) {
+            processedJSON = processedJSON + "}";
+        }
+        return processedJSON;
+    }
+
     private String cleanupMarkdownJSONCodeBlock(String processedJSON) {
         if(processedJSON.startsWith("```json")) {
             processedJSON = processedJSON.substring(7);
@@ -32,8 +44,8 @@ public class JSONAutoRepairer {
     }
 
     private String attemptToFix(String processedJSON) {
-        BasicCorrector basicCorrector = new BasicCorrector();
-        String fixedString = basicCorrector.fix(processedJSON);
+        String fixedString = processedJSON.trim();
+        fixedString = wrapWithBracketWhenNotAJSONArray(fixedString);
         EscapeProcessor internalQuoteEscapeProcessor = new EscapeProcessor(fixedString);
         fixedString = internalQuoteEscapeProcessor.process();
         try {
