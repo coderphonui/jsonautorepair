@@ -25,40 +25,38 @@ public class EscapeProcessor {
     private void processQuoteCharacter(char currentChar, int i) {
         if (!inQuotes) {
             inQuotes = true;
-            if(!isPreviousCloseQuoteGood(i)) {
-                escapedJson.append(',');
+            escapedJson.append(currentChar);
+            return;
+        }
+        if(isValidCloseQuote(i)) {
+            inQuotes = false;
+            escapedJson.append(currentChar);
+            return;
+        }
+        if(findNextValidChar(i + 1) == '\"') {
+            int nextValidCharPosition = getNextValidCharPosition(i + 1);
+            if(isValidCloseQuote(nextValidCharPosition)) {
+                escapedJson.append('\\');
+                escapedJson.append(currentChar);
+                return;
             }
+            inQuotes = false;
             escapedJson.append(currentChar);
+            escapedJson.append(',');
             return;
         }
-        if(!isValidCloseQuote(i)) {
-            escapedJson.append('\\');
-            escapedJson.append(currentChar);
-            return;
-        }
-        inQuotes = false;
+        escapedJson.append('\\');
         escapedJson.append(currentChar);
     }
 
-    private boolean isPreviousCloseQuoteGood(int position) {
-        // If the quote is the first character, there is no need to check for a good close quote
-        if(position == 0) {
-            return true;
-        }
-        // The previous close quote is good when it ends with a comma, or a curly brace,
-        // or a square bracket, or a colon
-        for (int i = position - 1; i >= 0; i--) {
+    private int getNextValidCharPosition(int position) {
+        for (int i = position; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
-            if (currentChar != ' '
-                    && currentChar != '\n'
-                    && currentChar != '\t') {
-                return currentChar == ','
-                        || currentChar == '{'
-                        || currentChar == '['
-                        || currentChar == ':';
+            if (currentChar != ' ' && currentChar != '\n' && currentChar != '\t') {
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
 
@@ -82,7 +80,7 @@ public class EscapeProcessor {
         };
     }
     private boolean isValidCloseQuote(int i) {
-        char nextValidChar = findNextValidChar(inputString, i + 1);
+        char nextValidChar = findNextValidChar(i + 1);
         return  nextValidChar == EOF
                 || nextValidChar == ','
                 || nextValidChar == '}'
@@ -90,7 +88,7 @@ public class EscapeProcessor {
                 || nextValidChar == ':';
     }
 
-    private char findNextValidChar(String inputString, int position) {
+    private char findNextValidChar(int position) {
         for (int i = position; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
             if (currentChar != ' ' && currentChar != '\n' && currentChar != '\t') {

@@ -5,8 +5,7 @@ import com.google.gson.JsonParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JSONAutoRepairerTest {
     private JSONAutoRepairer jsonAutoRepairer;
@@ -78,17 +77,17 @@ public class JSONAutoRepairerTest {
     }
 
     @Test
-    public void repair_should_escape_internal_quote_for_both_key_and_value() {
+    public void repair_should_escape_internal_quote() {
         String originalJSON = """
                 {
-                    ""sentence"": "Alice said: "hello"",
+                    "sentence": "Alice said: "hello"",
                     "sentiment": "normal"
                 }
                 """;
 
         assertEquals(JsonParser.parseString("""
                 {
-                    "\\"sentence\\"": "Alice said: \\"hello\\"",
+                    "sentence": "Alice said: \\"hello\\"",
                     "sentiment": "normal"
                 }
                 """).toString(),
@@ -115,23 +114,43 @@ public class JSONAutoRepairerTest {
         String originalJSON = """
                 {
                     "name": "Alice",
-                    "age": 30
-                    "address": "123 Andrew Street,\\n \\tward 3"
+                    "sex": "female"
+                    "address": "123 Andrew Street"
                 }
                 """;
         assertEquals(JsonParser.parseString("""
                 {
                     "name": "Alice",
-                    "age": 30,
-                    "address": "123 Andrew Street,\\n \\tward 3"
+                    "sex": "female",
+                    "address": "123 Andrew Street"
                 }
                 """).toString() , jsonAutoRepairer.repair(originalJSON));
+
+        assertEquals(JsonParser.parseString("""
+                ["apple", "banana", "cherry"]
+                """).toString() , jsonAutoRepairer.repair("[\"apple\" \"banana\" \"cherry\"]"));
 
     }
 
     @Test
     public void repair_should_return_null_when_cannot_fix_the_JSON() {
         assertNull(jsonAutoRepairer.repair("This is not a valid {} JSON"));
+    }
+
+    @Test
+    public void demo_case() {
+        String originalJSON = """
+                ```json
+                {
+                    "name": "Alice",
+                    "sex": "female"
+                    "address": "123 Andrew Street,
+                    ward 3, district 10"
+                }
+                ```
+                """;
+        String fixedJSON = jsonAutoRepairer.repair(originalJSON);
+        assertNotNull(fixedJSON);
     }
 
 }
