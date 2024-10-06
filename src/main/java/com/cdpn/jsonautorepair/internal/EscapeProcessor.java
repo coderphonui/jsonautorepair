@@ -5,6 +5,8 @@ public class EscapeProcessor {
     private static final char TAB_CHAR = '\t';
     private static final char BREAK_LINE_CHAR = '\n';
     private static final char SPACE_CHAR = ' ';
+    private static final char DOUBLE_QUOTE_CHAR = '\"';
+    private static final char ESCAPE_CHAR = '\\';
 
     private final String inputString;
     private boolean inQuotes = false;
@@ -20,7 +22,7 @@ public class EscapeProcessor {
         inQuotes = false;
         for (int i = 0; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
-            if (currentChar != '\"') {
+            if (currentChar != DOUBLE_QUOTE_CHAR) {
                 handleNonQuoteCharacter(currentChar);
             }
             else {
@@ -45,15 +47,15 @@ public class EscapeProcessor {
             handleQuoteNextToQuoteCase(currentChar, i);
             return;
         }
-        escapedJson.append('\\');
+        escapedJson.append(ESCAPE_CHAR);
         escapedJson.append(currentChar);
     }
 
     private void handleQuoteNextToQuoteCase(char currentChar, int i) {
-        int nextQuotePosition = getNextValidCharPosition(i + 1);
+        int nextQuotePosition = getNextNoneSpaceCharPosition(i + 1);
         // If next valid quote is a good close quote, then the current quote MUST be an escaped quote
         if(isValidCloseQuote(nextQuotePosition)) {
-            escapedJson.append('\\');
+            escapedJson.append(ESCAPE_CHAR);
             escapedJson.append(currentChar);
         }
         else {
@@ -67,10 +69,10 @@ public class EscapeProcessor {
     }
 
     private boolean hasNextQuoteRightAfterCurrentQuoteWithoutComma(int position) {
-        return findNextValidChar(position + 1) == '\"';
+        return findNextValidChar(position + 1) == DOUBLE_QUOTE_CHAR;
     }
 
-    private int getNextValidCharPosition(int position) {
+    private int getNextNoneSpaceCharPosition(int position) {
         for (int i = position; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
             if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
