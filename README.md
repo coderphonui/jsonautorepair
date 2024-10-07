@@ -22,7 +22,7 @@ A tiny library to repair JSON string output from LLM. It fixes most of the commo
     <dependency>
         <groupId>com.github.coderphonui</groupId>
         <artifactId>jsonautorepair</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </dependency>
 ```
 
