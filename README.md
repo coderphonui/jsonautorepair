@@ -20,8 +20,8 @@ A tiny library to repair JSON string output from LLM. It fixes most of the commo
     
 ```xml
     <dependency>
-        <groupId>com.github.coderphonui</groupId>
-        <artifactId>jsonautorepair</artifactId>
+        <groupId>com.cdpn</groupId>
+        <artifactId>llm-json-auto-repair</artifactId>
         <version>1.0.1</version>
     </dependency>
 ```
