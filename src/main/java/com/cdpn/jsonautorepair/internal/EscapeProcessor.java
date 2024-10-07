@@ -32,19 +32,19 @@ public class EscapeProcessor {
         return escapedJson.toString();
     }
 
-    private void handleQuoteCharacter(char currentChar, int i) {
+    private void handleQuoteCharacter(char currentChar, int position) {
         if (!inQuotes) {
             inQuotes = true;
             escapedJson.append(currentChar);
             return;
         }
-        if(isValidCloseQuote(i)) {
+        if(isValidCloseQuoteAtPosition(position)) {
             inQuotes = false;
             escapedJson.append(currentChar);
             return;
         }
-        if(hasNextQuoteRightAfterCurrentQuoteWithoutComma(i + 1)) {
-            handleQuoteNextToQuoteCase(currentChar, i);
+        if(hasNextQuoteRightAfterCurrentQuoteWithoutComma(position + 1)) {
+            handleQuoteNextToQuoteCase(currentChar, position);
             return;
         }
         escapedJson.append(ESCAPE_CHAR);
@@ -54,7 +54,7 @@ public class EscapeProcessor {
     private void handleQuoteNextToQuoteCase(char currentChar, int i) {
         int nextQuotePosition = getNextNonSpaceCharPosition(i + 1);
         // If next valid quote is a good close quote, then the current quote MUST be an escaped quote
-        if(isValidCloseQuote(nextQuotePosition)) {
+        if(isValidCloseQuoteAtPosition(nextQuotePosition)) {
             escapedJson.append(ESCAPE_CHAR);
             escapedJson.append(currentChar);
         }
@@ -69,19 +69,8 @@ public class EscapeProcessor {
     }
 
     private boolean hasNextQuoteRightAfterCurrentQuoteWithoutComma(int position) {
-        return findNextValidChar(position + 1) == DOUBLE_QUOTE_CHAR;
+        return findNextNonSpaceChar(position + 1) == DOUBLE_QUOTE_CHAR;
     }
-
-    private int getNextNonSpaceCharPosition(int position) {
-        for (int i = position; i < inputString.length(); i++) {
-            char currentChar = inputString.charAt(i);
-            if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
 
     private void handleNonQuoteCharacter(char currentChar) {
         if (!inQuotes) {
@@ -102,8 +91,8 @@ public class EscapeProcessor {
             default -> "";
         };
     }
-    private boolean isValidCloseQuote(int i) {
-        char nextValidChar = findNextValidChar(i + 1);
+    private boolean isValidCloseQuoteAtPosition(int position) {
+        char nextValidChar = findNextNonSpaceChar(position + 1);
         return  nextValidChar == EOF
                 || nextValidChar == ','
                 || nextValidChar == '}'
@@ -111,7 +100,7 @@ public class EscapeProcessor {
                 || nextValidChar == ':';
     }
 
-    private char findNextValidChar(int position) {
+    private char findNextNonSpaceChar(int position) {
         for (int i = position; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
             if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
@@ -119,6 +108,16 @@ public class EscapeProcessor {
             }
         }
         return EOF;
+    }
+
+    private int getNextNonSpaceCharPosition(int position) {
+        for (int i = position; i < inputString.length(); i++) {
+            char currentChar = inputString.charAt(i);
+            if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 }
