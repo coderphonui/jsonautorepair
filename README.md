@@ -1,7 +1,9 @@
 # LLM JSON auto repair
 
 ![Build](https://github.com/coderphonui/jsonautorepair/actions/workflows/maven.yml/badge.svg)
-[![Coverage](.github/badges/jacoco.svg)](https://github.com/coderphonui/jsonautorepair/actions/workflows/maven.yml)
+
+![Coverage](badges/jacoco.svg)
+
 
 A tiny library to repair JSON string output from LLM. It fixes most of the common issues from the LLM JSON output, eg:
 
