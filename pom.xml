@@ -23,6 +23,13 @@
 			<version>${gson.version}</version>
 		</dependency>
 	</dependencies>
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>coderphonui</name>
+			<url>https://maven.pkg.github.com/coderphonui/jsonautorepair</url>
+		</repository>
+	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
