@@ -38,7 +38,7 @@ public class EscapeProcessorTest {
     }
 
     @Test
-    public void process_should_escape_already_escaped_character() {
+    public void process_should_not_escape_already_escaped_character() {
         String originalJSON ="{\"address\":\"123 Andrew Street,\\n \\tward 3\"}";
         EscapeProcessor processor = new EscapeProcessor(originalJSON);
         assertEquals("{\"address\":\"123 Andrew Street,\\n \\tward 3\"}",

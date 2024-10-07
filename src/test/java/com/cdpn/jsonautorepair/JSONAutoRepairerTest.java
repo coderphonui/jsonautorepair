@@ -40,7 +40,7 @@ public class JSONAutoRepairerTest {
 
 
     @Test
-    public void repair_should_return_original_string_when_the_string_is_a_valid_JSON() {
+    public void repair_should_return_good_JSON_string_output_when_the_string_is_a_valid_JSON() {
         String originalJSON = """
                 {
                     "name": "Alice",

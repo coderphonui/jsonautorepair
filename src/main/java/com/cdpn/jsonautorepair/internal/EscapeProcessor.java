@@ -78,13 +78,13 @@ public class EscapeProcessor {
             return;
         }
         if(currentChar == TAB_CHAR || currentChar == BREAK_LINE_CHAR) {
-            escapedJson.append(getEscapeSequence(currentChar));
+            escapedJson.append(getEscapeStringFromChar(currentChar));
             return;
         }
         escapedJson.append(currentChar);
     }
 
-    private String getEscapeSequence(char currentChar) {
+    private String getEscapeStringFromChar(char currentChar) {
         return switch (currentChar) {
             case TAB_CHAR -> "\\t";
             case BREAK_LINE_CHAR -> "\\n";
