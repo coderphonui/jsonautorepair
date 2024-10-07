@@ -37,6 +37,8 @@ public class JSONAutoRepairerTest {
 
     }
 
+
+
     @Test
     public void repair_should_return_original_string_when_the_string_is_a_valid_JSON() {
         String originalJSON = """
@@ -68,6 +70,7 @@ public class JSONAutoRepairerTest {
         assertEquals("[\"sea\",\"fish\"]", jsonAutoRepairer.repair("[\"sea\",\"fish\"]"));
     }
 
+
     @Test
     public void repair_should_add_quotes_around_unquoted_keys() {
         assertEquals("{\"name\":\"Alice\",\"age\":30}",
@@ -75,6 +78,23 @@ public class JSONAutoRepairerTest {
         assertEquals("{\"name\":\"Alice\",\"age\":30}",
                 jsonAutoRepairer.repair("{name: \"Alice\", age: 30 }"));
     }
+
+    @Test
+    public void repair_should_replace_single_quote_by_double_quote_around_key_and_value() {
+        assertEquals("{\"name\":\"Alice\"}",
+                jsonAutoRepairer.repair("{ 'name': 'Alice' }"));
+    }
+
+    @Test
+    public void repair_should_add_quote_to_key_and_value_when_possible() {
+        assertEquals("{\"name\":\"Alice\"}",
+                jsonAutoRepairer.repair("{ \"name\": Alice }"));
+
+        assertEquals("{\"name\":\"Alice\",\"sex\":\"female\"}",
+                jsonAutoRepairer.repair("{ \"name\": Alice, sex: female }"));
+
+    }
+
 
     @Test
     public void repair_should_escape_internal_quote() {
