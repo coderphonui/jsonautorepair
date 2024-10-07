@@ -7,6 +7,7 @@ A tiny library to repair JSON string output from LLM. It fixes most of the commo
 * Add missing double quotes when possible
 * Replace single quotes with double quotes
 * Escape special characters \t \n
+* and many other common issues
 
 ## Usage
 
@@ -24,4 +25,4 @@ A tiny library to repair JSON string output from LLM. It fixes most of the commo
 String fixedJSON = jsonAutoRepairer.repair(originalJSON);
 ```
 
-It will automatically fix the JSON string and return the fixed JSON string if possible. In case, the JSON string cannot be fixed, it returns null
+It will automatically fix the JSON string and return the fixed JSON string if possible. In case the JSON string cannot be fixed, it returns null
