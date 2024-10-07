@@ -16,8 +16,24 @@ A tiny library to repair JSON string output from LLM. It fixes most of the commo
 
 ## Usage
 
+## Add dependency
+    
+```xml
+    <dependency>
+        <groupId>com.github.coderphonui</groupId>
+        <artifactId>jsonautorepair</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+```
+
+Your Java code
+
 ```java
- String originalJSON = """
+
+import com.cdpn.jsonautofix.JSONAutoFixer;
+
+JSONAutoFixer jsonAutoRepairer = new JSONAutoFixer();
+String originalJSON = """
                 ```json
                 {
                     "name": "Alice",
