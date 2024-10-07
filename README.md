@@ -30,9 +30,9 @@ Your Java code
 
 ```java
 
-import com.cdpn.jsonautofix.JSONAutoFixer;
+import com.cdpn.jsonautorepair.JSONAutoRepairer;
 
-JSONAutoFixer jsonAutoRepairer = new JSONAutoFixer();
+JSONAutoRepairer jsonAutoRepairer = new JSONAutoRepairer();
 String originalJSON = """
                 ```json
                 {
