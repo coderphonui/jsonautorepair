@@ -37,6 +37,33 @@ public class JSONAutoRepairerTest {
 
     }
 
+    @Test
+    public void repair_should_fix_missing_end_quote_of_value() {
+        String originalJSON = """
+                {
+                    "name": "Alice,
+                    "age": 30
+                }
+                """;
+        assertEquals(JsonParser.parseString("""
+                {
+                    "name": "Alice",
+                    "age": 30
+                }
+                """).toString(), jsonAutoRepairer.repair(originalJSON));
+
+        originalJSON = """
+                {
+                    "name": "Alice,
+                }
+                """;
+        assertEquals(JsonParser.parseString("""
+                {
+                    "name": "Alice"
+                }
+                """).toString(), jsonAutoRepairer.repair(originalJSON));
+    }
+
 
 
     @Test

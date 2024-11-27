@@ -3,6 +3,8 @@ package com.cdpn.jsonautorepair.internal;
 public class EscapeProcessor {
     private static final char EOF = '\0';
     private static final char TAB_CHAR = '\t';
+    private static final char COMMA = ',';
+    private static final char CLOSED_BRACKET = '}';
     private static final char BREAK_LINE_CHAR = '\n';
     private static final char SPACE_CHAR = ' ';
     private static final char DOUBLE_QUOTE_CHAR = '\"';
@@ -23,7 +25,7 @@ public class EscapeProcessor {
         for (int i = 0; i < inputString.length(); i++) {
             char currentChar = inputString.charAt(i);
             if (currentChar != DOUBLE_QUOTE_CHAR) {
-                handleNonQuoteCharacter(currentChar);
+                handleNonQuoteCharacter(currentChar, i);
             }
             else {
                 handleQuoteCharacter(currentChar, i);
@@ -72,7 +74,23 @@ public class EscapeProcessor {
         return findNextNonSpaceChar(position + 1) == DOUBLE_QUOTE_CHAR;
     }
 
-    private void handleNonQuoteCharacter(char currentChar) {
+    private void handleNonQuoteCharacter(char currentChar, int position) {
+        if (currentChar == COMMA) {
+            char nextNonSpaceChar = findNextNonSpaceChar(position + 1);
+            if (inQuotes) {
+                if (nextNonSpaceChar == DOUBLE_QUOTE_CHAR ) {
+                    escapedJson.append(DOUBLE_QUOTE_CHAR);
+                    inQuotes = false;
+                }
+                if (nextNonSpaceChar == CLOSED_BRACKET ) {
+                    escapedJson.append(DOUBLE_QUOTE_CHAR);
+                    inQuotes = false;
+                    return;
+                }
+            }
+            escapedJson.append(currentChar);
+            return;
+        }
         if (!inQuotes) {
             escapedJson.append(currentChar);
             return;
