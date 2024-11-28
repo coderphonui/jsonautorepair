@@ -75,28 +75,44 @@ public class EscapeProcessor {
     }
 
     private void handleNonQuoteCharacter(char currentChar, int position) {
-        if (currentChar == COMMA) {
-            char nextNonSpaceChar = findNextNonSpaceChar(position + 1);
-            if (inQuotes) {
-                if (nextNonSpaceChar == DOUBLE_QUOTE_CHAR ) {
-                    escapedJson.append(DOUBLE_QUOTE_CHAR);
-                    inQuotes = false;
-                }
-                if (nextNonSpaceChar == CLOSED_BRACKET ) {
-                    escapedJson.append(DOUBLE_QUOTE_CHAR);
-                    inQuotes = false;
-                    return;
-                }
-            }
-            escapedJson.append(currentChar);
-            return;
-        }
         if (!inQuotes) {
             escapedJson.append(currentChar);
             return;
         }
         if(currentChar == TAB_CHAR || currentChar == BREAK_LINE_CHAR) {
             escapedJson.append(getEscapeStringFromChar(currentChar));
+            return;
+        }
+        if (currentChar == COMMA) {
+            handleCommaToFixMissingClosedQuote(currentChar, position);
+            return;
+        }
+        if (currentChar == CLOSED_BRACKET) {
+            handleClosedBracket(currentChar, position);
+            return;
+        }
+        escapedJson.append(currentChar);
+    }
+
+    private void handleClosedBracket(char currentChar, int position) {
+        int previousNonSpaceCharPosition = getPreviousNonSpaceCharPosition(position - 1);
+        if (previousNonSpaceCharPosition != -1) {
+           escapedJson = new StringBuilder(escapedJson.substring(0, previousNonSpaceCharPosition + 1 ));
+        }
+        escapedJson.append(DOUBLE_QUOTE_CHAR);
+        escapedJson.append(currentChar);
+        inQuotes = false;
+    }
+
+    private void handleCommaToFixMissingClosedQuote(char currentChar, int position) {
+        char nextNonSpaceChar = findNextNonSpaceChar(position + 1);
+        if (nextNonSpaceChar == DOUBLE_QUOTE_CHAR ) {
+            escapedJson.append(DOUBLE_QUOTE_CHAR);
+            inQuotes = false;
+        }
+        if (nextNonSpaceChar == CLOSED_BRACKET ) {
+            escapedJson.append(DOUBLE_QUOTE_CHAR);
+            inQuotes = false;
             return;
         }
         escapedJson.append(currentChar);
@@ -128,8 +144,19 @@ public class EscapeProcessor {
         return EOF;
     }
 
+
     private int getNextNonSpaceCharPosition(int position) {
         for (int i = position; i < inputString.length(); i++) {
+            char currentChar = inputString.charAt(i);
+            if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int getPreviousNonSpaceCharPosition(int position) {
+        for (int i = position; i >= 0; i--) {
             char currentChar = inputString.charAt(i);
             if (currentChar != SPACE_CHAR && currentChar != BREAK_LINE_CHAR && currentChar != TAB_CHAR) {
                 return i;
