@@ -46,6 +46,7 @@ jobs:
         name: jacoco-report
         path: target/site/jacoco/
     - name: Commit and push
+      if: github.event_name != 'pull_request'
       run: |
         cd badges
         if [[ `git status --porcelain *.svg` ]]; then
