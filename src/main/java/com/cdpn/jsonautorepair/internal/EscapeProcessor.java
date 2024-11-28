@@ -106,7 +106,13 @@ public class EscapeProcessor {
 
     private void handleCommaToFixMissingClosedQuote(char currentChar, int position) {
         char nextNonSpaceChar = findNextNonSpaceChar(position + 1);
+        int nextNonSpaceCharPosition = getNextNonSpaceCharPosition(position + 1);
         if (nextNonSpaceChar == DOUBLE_QUOTE_CHAR ) {
+            // We MUST ignore adding close quote if the next quote is a good close quote
+            if(isValidCloseQuoteAtPosition(nextNonSpaceCharPosition)) {
+                escapedJson.append(currentChar);
+                return;
+            }
             escapedJson.append(DOUBLE_QUOTE_CHAR);
             inQuotes = false;
         }

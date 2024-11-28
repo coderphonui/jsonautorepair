@@ -74,8 +74,21 @@ public class JSONAutoRepairerTest {
                 """));
     }
 
-
-
+    @Test
+    public void repair_should_treat_the_comma_before_a_good_close_quote_as_other_characters() {
+        String originalJSON = """
+                {
+                     "type": "5,
+                     "hits": [
+                         {
+                             "hitText": "hello,",
+                             "index": "2"
+                         }
+                     ]
+                }```
+                """;
+        assertNotNull(jsonAutoRepairer.repair(originalJSON));
+    }
     @Test
     public void repair_should_return_good_JSON_string_output_when_the_string_is_a_valid_JSON() {
         String originalJSON = """
